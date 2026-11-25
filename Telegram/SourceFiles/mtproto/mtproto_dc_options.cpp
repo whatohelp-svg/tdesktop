@@ -126,7 +126,7 @@ void DcOptions::constructFromBuiltIn() {
 
 	const auto list = gsl::make_span(kBuiltInDcs);
 	for (const auto &entry : list) {
-		const auto flags = Flag::f_static | 0;
+		const auto flags = Flag::f_static | Flag::f_tcpo_only;
 		applyOneGuarded(entry.id, flags, entry.ip, entry.port, {});
 		DEBUG_LOG(("MTP Info: adding built in DC %1 connect option: %2:%3"
 			).arg(entry.id
@@ -139,45 +139,10 @@ void DcOptions::constructFromBuiltIn() {
 void DcOptions::processFromList(
 		const QVector<MTPDcOption> &options,
 		bool overwrite) {
-	if (options.empty() || _immutable) {
-		return;
-	}
-
-	auto data = [&] {
-		if (overwrite) {
-			return base::flat_map<DcId, std::vector<Endpoint>>();
-		}
-		ReadLocker lock(this);
-		return _data;
-	}();
-	for (auto &mtpOption : options) {
-		if (mtpOption.type() != mtpc_dcOption) {
-			LOG(("Wrong type in DcOptions: %1").arg(mtpOption.type()));
-			continue;
-		}
-
-		const auto &option = mtpOption.c_dcOption();
-		auto dcId = option.vid().v;
-		auto flags = option.vflags().v;
-		auto ip = std::string(
-			option.vip_address().v.constData(),
-			option.vip_address().v.size());
-		auto port = option.vport().v;
-		auto secret = bytes::make_vector(option.vsecret().value_or_empty());
-		ApplyOneOption(data, dcId, flags, ip, port, secret);
-	}
-
-	const auto difference = [&] {
-		WriteLocker lock(this);
-		auto result = CountOptionsDifference(_data, data);
-		if (!result.empty()) {
-			_data = std::move(data);
-		}
-		return result;
-	}();
-	for (const auto dcId : difference) {
-		_changed.fire_copy(dcId);
-	}
+	// Server-provided addresses must not replace the pinned RiseGram TCP route.
+	// This port is deliberately single-DC; changing the endpoint requires a client update.
+	(void)options;
+	(void)overwrite;
 }
 
 void DcOptions::setFromList(const MTPVector<MTPDcOption> &options) {

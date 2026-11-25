@@ -136,19 +136,9 @@ void ConfigLoader::setPhone(const QString &phone) {
 }
 
 void ConfigLoader::createSpecialLoader() {
-	const auto testMode = _instance->isTestMode();
+	// RiseGram has a single private DC. Never discover Telegram public endpoints.
+	_specialLoader.reset();
 	_triedSpecialEndpoints.clear();
-	_specialLoader = std::make_unique<SpecialConfigRequest>([=](
-			DcId dcId,
-			const std::string &ip,
-			int port,
-			bytes::const_span secret) {
-		if (ip.empty()) {
-			_specialLoader = nullptr;
-		} else {
-			addSpecialEndpoint(dcId, ip, port, secret);
-		}
-	}, testMode, _instance->configValues().txtDomainString, _phone);
 }
 
 void ConfigLoader::addSpecialEndpoint(
