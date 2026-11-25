@@ -13,6 +13,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/version.h"
 #include "mtproto/facade.h"
 #include "platform/platform_specific.h"
+#include <QtCore/QStandardPaths>
 
 namespace {
 
@@ -357,26 +358,9 @@ void start() {
 	Assert(LogsData == nullptr);
 
 	auto &launcher = Core::Launcher::Instance();
-	if (!launcher.checkPortableVersionFolder()) {
-		return;
-	}
-
+	// RiseGram never imports a Telegram session or uses an executable-adjacent tdata.
 	LogsData = new LogsDataFields();
-	if (cWorkingDir().isEmpty()) {
-#if (!defined Q_OS_WIN && !defined _DEBUG) || defined Q_OS_WINRT || defined OS_WIN_STORE || defined OS_MAC_STORE
-		cForceWorkingDir(psAppDataPath());
-#else // (!Q_OS_WIN && !_DEBUG) || Q_OS_WINRT || OS_WIN_STORE || OS_MAC_STORE
-		cForceWorkingDir(cExeDir());
-		if (!LogsData->openMain()) {
-			cForceWorkingDir(psAppDataPath());
-		}
-#endif // (!Q_OS_WIN && !_DEBUG) || Q_OS_WINRT || OS_WIN_STORE || OS_MAC_STORE
-	}
-
-	if (launcher.validateCustomWorkingDir()) {
-		delete LogsData;
-		LogsData = new LogsDataFields();
-	}
+	cForceWorkingDir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + u"/RiseGram/"_q);
 
 // WinRT build requires the working dir to stay the same for plugin loading.
 #ifndef Q_OS_WINRT
@@ -415,13 +399,7 @@ void start() {
 		return;
 	}
 
-#ifdef Q_OS_WIN
-	if (cWorkingDir() == psAppDataPath()) { // fix old "Telegram Win (Unofficial)" version
-		MoveOldDataFiles(psAppDataPathOld());
-	}
-#elif !defined Q_OS_MACOS && !defined _DEBUG // fix first version
-	MoveOldDataFiles(launcher.initialWorkingDir());
-#endif
+
 
 	if (LogsInMemory) {
 		Assert(LogsInMemory != DeletedLogsInMemory);
