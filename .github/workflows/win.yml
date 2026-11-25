@@ -148,7 +148,7 @@ jobs:
           fi
           echo "TDESKTOP_BUILD_GENERATOR=$GENERATOR" >> $GITHUB_ENV
 
-          [ -n "$GENERATOR" ] && ARCH=""
+          if [ -n "$GENERATOR" ]; then ARCH=""; fi
           echo "TDESKTOP_BUILD_ARCH=$ARCH" >> $GITHUB_ENV
 
           DEFINE=""
@@ -194,8 +194,9 @@ jobs:
         if: (env.UPLOAD_ARTIFACT == 'true') || (github.ref == 'refs/heads/nightly')
         run: |
           set OUT=%TBUILD%\%REPO_NAME%\out\Debug
-          mkdir artifact
-          move %OUT%\Telegram.exe artifact\RiseGram.exe
+          if not exist artifact mkdir artifact
+          if not exist "%OUT%\Telegram.exe" exit /b 1
+          copy /Y "%OUT%\Telegram.exe" artifact\RiseGram.exe
       - uses: actions/upload-artifact@v7
         name: Upload artifact.
         if: (env.UPLOAD_ARTIFACT == 'true') || (github.ref == 'refs/heads/nightly')
