@@ -38,6 +38,7 @@ jobs:
           | sudo tar xJ -C /usr/local/bin --strip-components=1 ccache-4.13.6-linux-x86_64-glibc/ccache
           echo "CCACHE_DIR=$RUNNER_TEMP/.tdesktop-cache" >> $GITHUB_ENV
           cd Telegram/build/docker/centos_env
+          export PATH="$HOME/.local/bin:$PATH"
           poetry install
           DOCKERFILE=$(DEBUG= LTO= poetry run gen_dockerfile)
           echo "$DOCKERFILE" > Dockerfile
@@ -102,7 +103,7 @@ jobs:
             echo Define from matrix: $DEFINE
             echo "ARTIFACT_NAME=RiseGram-Linux ${{ matrix.defines }}" >> $GITHUB_ENV
           else
-            echo "ARTIFACT_NAME=Telegram" >> $GITHUB_ENV
+            echo "ARTIFACT_NAME=RiseGram-Linux-x64" >> $GITHUB_ENV
           fi
 
           ccache -z
