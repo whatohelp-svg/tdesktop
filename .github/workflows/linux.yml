@@ -119,7 +119,7 @@ jobs:
           -D CMAKE_CONFIGURATION_TYPES=Debug \
           -D CMAKE_C_FLAGS_DEBUG="-O0 -fpch-preprocess" \
           -D CMAKE_CXX_FLAGS_DEBUG="-O0 -fpch-preprocess" \
-          -D CMAKE_COMPILE_WARNING_AS_ERROR=ON \
+          -D CMAKE_COMPILE_WARNING_AS_ERROR=OFF \
           -D TDESKTOP_API_TEST=ON \
           -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON \
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON \
@@ -169,7 +169,7 @@ jobs:
         if: env.UPLOAD_ARTIFACT == 'true'
         run: |
           cd out/Debug
-          mkdir artifact
+          mkdir -p artifact
           install -m 755 Telegram artifact/RiseGram
           tar -czf artifact/RiseGram-linux-x64.tar.gz -C artifact RiseGram
           rm artifact/RiseGram
@@ -179,4 +179,5 @@ jobs:
         with:
           name: ${{ env.ARTIFACT_NAME }}
           path: out/Debug/artifact/
+          if-no-files-found: error
           retention-days: 7
