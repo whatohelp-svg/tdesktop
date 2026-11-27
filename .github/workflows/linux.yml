@@ -30,6 +30,12 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Apply RiseGram branding
+        run: |
+          python3 -m venv "$RUNNER_TEMP/risegram-brand"
+          "$RUNNER_TEMP/risegram-brand/bin/pip" install Pillow
+          "$RUNNER_TEMP/risegram-brand/bin/python" scripts/risegram_brand.py
+
       - name: First set up.
         run: |
           sudo apt update

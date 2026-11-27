@@ -60,6 +60,15 @@ jobs:
           submodules: recursive
           path: ${{ env.TBUILD }}\${{ env.REPO_NAME }}
 
+      - name: Apply RiseGram branding
+        shell: cmd
+        run: |
+          cd /d %TBUILD%\%REPO_NAME%
+          python -m pip install Pillow
+          if errorlevel 1 exit /b 1
+          python scripts\risegram_brand.py
+          if errorlevel 1 exit /b 1
+
       - name: First set up.
         shell: bash
         run: |

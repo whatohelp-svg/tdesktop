@@ -122,7 +122,7 @@ namespace {
 	std::move(
 		palettes
 	) | rpl::map([] {
-		return TelegramLogoImage();
+		return QImage(u":/gui/art/logo_256_no_margin.png"_q);
 	}) | rpl::on_next([=](QImage &&image) {
 		state->center = std::move(image);
 	}, result->lifetime());
