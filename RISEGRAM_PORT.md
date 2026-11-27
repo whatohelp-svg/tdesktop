@@ -7,3 +7,6 @@ Linux: use docs/building-linux.md and the native Docker toolchain, with your own
 ## CI builds
 
 The experimental Windows and Linux builds run on pushes to `risegram/native-port`. Check the Actions run for each platform and download its artifact only after a successful build. These are test binaries, not verified installers.
+
+## Current desktop beta limitations
+The build now applies the monochrome RiseGram branding and adds +888 to the phone country list. The current source speaks MTProto layer 234; production currently rejects that exact layer. A successful Windows or Linux compilation does not establish login compatibility. Do not distribute as a verified release until a matching schema and real sign-in are tested.
